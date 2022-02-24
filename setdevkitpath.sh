@@ -55,7 +55,7 @@ else
 export JVM_PLATFORM=linux
 # Set NDK
 export NEW_API=16
-export API=9
+export API=12
 #export STL=libc++
 export NDK=`pwd`/android-ndk-$NDK_VERSION
 export TOOLCHAIN=$NDK/generated-toolchains/android-${TARGET_SHORT}-toolchain
