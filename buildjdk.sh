@@ -7,6 +7,7 @@ then
   export TARGET_JDK=aarch32
   export TARGET_PHYS=aarch32-linux-androideabi
   export JVM_VARIANTS=client
+  export CFLAGS+=" -march=armv7-a -mhard-float -D_NDK_MATH_NO_SOFTFP=1"
 else
   export TARGET_PHYS=$TARGET
 fi
