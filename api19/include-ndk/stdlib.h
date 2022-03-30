@@ -36,6 +36,8 @@
 #include <malloc.h>
 #include <stddef.h>
 
+#include <sys/types.h>
+
 __BEGIN_DECLS
 
 #define EXIT_FAILURE 1
