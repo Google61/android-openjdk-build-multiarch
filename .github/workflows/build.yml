@@ -18,6 +18,11 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.7
+    - name: Set ANDROID_NDK_HOME
+      run: |
+        majorVersion=23
+        ndkFullVersion=$($SDKMANAGER --list | grep "ndk;${majorVersion}.*" | awk '{gsub("ndk;", ""); print $1}' | sort -V | tail -n1)
+        echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${ndkFullVersion}" >> $GITHUB_ENV
     - name: Build with CI build script
       run: bash "ci_build_arch_${{matrix.arch}}.sh"
     - name: Upload JDK build output
