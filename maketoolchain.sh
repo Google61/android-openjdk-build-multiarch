@@ -2,8 +2,8 @@
 set -e
 
 . setdevkitpath.sh
-  
-$NDK/build/tools/make-standalone-toolchain.sh \
+
+ANDROID_NDK_ROOT=$NDK $NDK/build/tools/make-standalone-toolchain.sh \
 	--system=linux-x86_64 \
 	--arch=${TARGET_SHORT} \
 	--platform=android-$API \
