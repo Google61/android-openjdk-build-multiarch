@@ -28,6 +28,7 @@ jobs:
         setenv ANDROID_ROOT=/usr/local/lib/android
         setenv ANDROID_SDK_ROOT=${ANDROID_ROOT}/sdk
         setenv ANDROID_NDK_ROOT=${ANDROID_SDK_ROOT}/ndk-bundle
+        setenv ANDROID_NDK_HOME=${ANDROID_NDK_ROOT}
         setenv SDKMANAGER=${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager
         ndkDefaultFullVersion=$(get_full_ndk_version "23")
         ln -sf $ANDROID_SDK_ROOT/ndk/$ndkDefaultFullVersion $ANDROID_NDK_ROOT
