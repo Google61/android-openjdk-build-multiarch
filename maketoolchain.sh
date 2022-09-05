@@ -12,5 +12,5 @@ cp devkit.info.${TARGET_SHORT} $NDK/generated-toolchains/android-${TARGET_SHORT}
 
 $ANDROID_NDK_HOME/build/tools/make_standalone_toolchain.py \
 	--arch=${TARGET_SHORT} \
-	--platform=android-$API \
+	--api=android-$API \
 	--install-dir=$GITHUB_WORKSPACE/android-toolchain
