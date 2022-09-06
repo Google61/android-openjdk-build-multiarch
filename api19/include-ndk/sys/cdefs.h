@@ -52,6 +52,12 @@
 #else
 #define __NDK_FPABI__
 #endif
+
+#if (!defined(_NDK_MATH_NO_SOFTFP) || _NDK_MATH_NO_SOFTFP != 1) && !defined(__clang__)
+#define __NDK_FPABI_MATH__ __NDK_FPABI__
+#else
+#define __NDK_FPABI_MATH__  /* nothing */
+#endif
 ////
 
 #if defined(__cplusplus)
