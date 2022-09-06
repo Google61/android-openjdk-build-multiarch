@@ -36,26 +36,23 @@
 
 #pragma once
 
+/**
+ * `__BIONIC__` is always defined if you're building with bionic. See
+ * https://android.googlesource.com/platform/bionic/+/master/docs/defines.md.
+ */
 #define __BIONIC__ 1
 
-
+//// r10e libc++ compat
 #define __ANDROID__
 #define __has_builtin(x) 0
 #define __has_include(x) 0
 
-// old libc++ compat
 #if defined(__ANDROID__) && !defined(__LP64__) && defined( __arm__)
 #define __NDK_FPABI__ __attribute__((pcs("aapcs")))
 #else
 #define __NDK_FPABI__
 #endif
-
-#if (!defined(_NDK_MATH_NO_SOFTFP) || _NDK_MATH_NO_SOFTFP != 1) && !defined(__clang__)
-#define __NDK_FPABI_MATH__ __NDK_FPABI__
-#else
-#define __NDK_FPABI_MATH__  /* nothing */
-#endif
-//
+////
 
 #if defined(__cplusplus)
 #define __BEGIN_DECLS extern "C" {
@@ -217,11 +214,18 @@
  * Note that some functions have their __RENAME_LDBL commented out as a sign that although we could
  * use __RENAME_LDBL it would actually cause the function to be introduced later because the
  * `long double` variant appeared before the `double` variant.
+ *
+ * The _NO_GUARD_FOR_NDK variants keep the __VERSIONER_NO_GUARD behavior working for the NDK. This
+ * allows libc++ to refer to these functions in inlines without needing to guard them, needed since
+ * libc++ doesn't currently guard these calls. There's no risk to the apps though because using
+ * those APIs will still cause a link error.
  */
 #if defined(__LP64__) || defined(__BIONIC_LP32_USE_LONG_DOUBLE)
 #define __RENAME_LDBL(rewrite,rewrite_api_level,regular_api_level) __INTRODUCED_IN(regular_api_level)
+#define __RENAME_LDBL_NO_GUARD_FOR_NDK(rewrite,rewrite_api_level,regular_api_level) __INTRODUCED_IN_NO_GUARD_FOR_NDK(regular_api_level)
 #else
 #define __RENAME_LDBL(rewrite,rewrite_api_level,regular_api_level) __RENAME(rewrite) __INTRODUCED_IN(rewrite_api_level)
+#define __RENAME_LDBL_NO_GUARD_FOR_NDK(rewrite,rewrite_api_level,regular_api_level) __RENAME(rewrite) __INTRODUCED_IN_NO_GUARD_FOR_NDK(rewrite_api_level)
 #endif
 
 /*
@@ -252,14 +256,15 @@
 #define __BIONIC_FORTIFY_UNKNOWN_SIZE ((size_t) -1)
 
 #if defined(_FORTIFY_SOURCE) && _FORTIFY_SOURCE > 0
-/*
- * FORTIFY's _chk functions effectively disable ASAN's stdlib interceptors.
- * Additionally, the static analyzer/clang-tidy try to pattern match some
- * standard library functions, and FORTIFY sometimes interferes with this. So,
- * we turn FORTIFY off in both cases.
- */
-#  if !__has_feature(address_sanitizer) && !defined(__clang_analyzer__)
+/* FORTIFY can interfere with pattern-matching of clang-tidy/the static analyzer.  */
+#  if !defined(__clang_analyzer__)
 #    define __BIONIC_FORTIFY 1
+/* ASAN has interceptors that FORTIFY's _chk functions can break.  */
+#    if __has_feature(address_sanitizer)
+#      define __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED 0
+#    else
+#      define __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED 1
+#    endif
 #  endif
 #endif
 
@@ -288,10 +293,12 @@
  */
 #  define __call_bypassing_fortify(fn) (&fn)
 /*
- * Because clang-FORTIFY uses overloads, we can't mark functions as `extern
- * inline` without making them available externally.
+ * Because clang-FORTIFY uses overloads, we can't mark functions as `extern inline` without making
+ * them available externally. FORTIFY'ed functions try to be as close to possible as 'invisible';
+ * having stack protectors detracts from that (b/182948263).
  */
-#  define __BIONIC_FORTIFY_INLINE static __inline__ __always_inline
+#  define __BIONIC_FORTIFY_INLINE static __inline__ __attribute__((no_stack_protector)) \
+      __always_inline __VERSIONER_FORTIFY_INLINE
 /*
  * We should use __BIONIC_FORTIFY_VARIADIC instead of __BIONIC_FORTIFY_INLINE
  * for variadic functions because compilers cannot inline them.
@@ -317,7 +324,7 @@
 
 /* Intended for use in evaluated contexts. */
 #define __bos_dynamic_check_impl_and(bos_val, op, index, cond) \
-  (bos_val == __BIONIC_FORTIFY_UNKNOWN_SIZE ||                 \
+  ((bos_val) == __BIONIC_FORTIFY_UNKNOWN_SIZE ||                 \
    (__builtin_constant_p(index) && bos_val op index && (cond)))
 
 #define __bos_dynamic_check_impl(bos_val, op, index) \
@@ -331,6 +338,8 @@
 #endif
 
 #define __overloadable __attribute__((overloadable))
+
+#define __diagnose_as_builtin(...) __attribute__((diagnose_as_builtin(__VA_ARGS__)))
 
 /* Used to tag non-static symbols that are private and never exposed by the shared library. */
 #define __LIBC_HIDDEN__ __attribute__((visibility("hidden")))
