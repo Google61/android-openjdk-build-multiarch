@@ -1,19 +1,24 @@
-#ifndef ANDROID_NDK_VERSION_H
-#define ANDROID_NDK_VERSION_H
+#pragma once
+
+/**
+ * Set to 1 if this is an NDK, unset otherwise. See
+ * https://android.googlesource.com/platform/bionic/+/master/docs/defines.md.
+ */
+#define __ANDROID_NDK__ 1
 
 /**
  * Major version of this NDK.
  *
  * For example: 16 for r16.
  */
-#define __NDK_MAJOR__ 21
+#define __NDK_MAJOR__ 25
 
 /**
  * Minor version of this NDK.
  *
  * For example: 0 for r16 and 1 for r16b.
  */
-#define __NDK_MINOR__ 4
+#define __NDK_MINOR__ 1
 
 /**
  * Set to 0 if this is a release build, or 1 for beta 1,
@@ -26,11 +31,9 @@
  *
  * For a local development build of the NDK, this is -1.
  */
-#define __NDK_BUILD__ 7075529
+#define __NDK_BUILD__ 8937393
 
 /**
  * Set to 1 if this is a canary build, 0 if not.
  */
 #define __NDK_CANARY__ 0
-
-#endif  /* ANDROID_NDK_VERSION_H */
