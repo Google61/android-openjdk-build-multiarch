@@ -18,7 +18,8 @@
 
 // The `annotate` attribute always pulls the annotated (inline) function into the object files, thus
 // we should only annotate headers when we are running versioner.
-#if defined(__BIONIC_VERSIONER)
+//// old style for gcc
+#if _GNUC_ <= 4 || defined(__BIONIC_VERSIONER)
 
 #define __INTRODUCED_IN(api_level) __attribute__((annotate("introduced_in=" #api_level)))
 #define __INTRODUCED_IN_NO_GUARD_FOR_NDK(api_level) __attribute__((annotate("introduced_in=" #api_level))) __VERSIONER_NO_GUARD
