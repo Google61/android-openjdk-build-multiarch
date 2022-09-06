@@ -26,12 +26,12 @@
  * SUCH DAMAGE.
  */
 #define _GLIBCXX_USE_C99_CTYPE_TR1
+#include <algorithm>
 #include <errno.h>
 #include <sys/param.h>
 #include <uchar.h>
 #include <wchar.h>
 #include <bionic_mbstate.h>
-//#include <algorithm>
 
 size_t mbrtoc32(char32_t* pc32, const char* s, size_t n, mbstate_t* ps) {
   static mbstate_t __private_state;
