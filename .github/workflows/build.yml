@@ -19,6 +19,7 @@ jobs:
       with:
         java-version: 1.7
     - name: Setup NDK
+      id: setup-ndk
       uses: nttld/setup-ndk@v1
       with:
         ndk-version: r21e
